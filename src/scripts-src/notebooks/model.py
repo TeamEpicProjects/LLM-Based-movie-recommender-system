@@ -8,6 +8,10 @@ import streamlit as st
 tv_df = pd.read_csv("C:/Users/Srijan/Movie-recommender-application/src/data/Preprocessed/tv_preprocessed.csv")
 movies_df = pd.read_csv("C:/Users/Srijan/Movie-recommender-application/src/data/Preprocessed/movies_preprocessed.csv")
 
+# Add 'age_appropriate' column based on 'adult' field
+tv_df['age_appropriate'] = ~tv_df['adult']
+movies_df['age_appropriate'] = ~movies_df['adult']
+
 # Helper functions
 def filter_by_genre(df, genres):
     return df[df['genre_names'].apply(lambda x: any(genre in x for genre in genres))]
@@ -15,7 +19,7 @@ def filter_by_genre(df, genres):
 def filter_by_popularity(df, threshold):
     return df[df['popularity'] >= threshold]
 
-groq.api_key = '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'
+groq.api_key = 'key'
 
 def get_similar_overview(target_overview, candidates):
     prompt = f"Find the closest matching overviews to: {target_overview}\n\nCandidates:\n" + "\n".join(candidates)
