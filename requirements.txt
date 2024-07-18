@@ -1,4 +1,8 @@
 pandas
+numpy
+cython
 scikit-learn
+scikit-surprise
 torch
 transformers
+requests
