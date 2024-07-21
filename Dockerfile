@@ -22,5 +22,7 @@ RUN chmod 0644 /etc/cron.d/fetch_cron
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
 
-# Run the command on container startup
-CMD cron && tail -f /var/log/cron.log
+#add cron daemon
+CMD ["sh", "-c", "cron && tail -f /var/log/cron.log"]
+
+RUN chmod +x src\scripts-src\notebooks\requesting.py

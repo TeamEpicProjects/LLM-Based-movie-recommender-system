@@ -1,1 +1,1 @@
-0 0 1 * * root python /app/src/fetch_data.py >> /var/log/cron.log 2>&1
+0 0 1 * * root python src\scripts-src\notebooks\requesting.py >> /var/log/cron.log 2>&1

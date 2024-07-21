@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  recommender:
+    build: .
+    volumes:
+      - .:/app
+    container_name: movie_recommender
