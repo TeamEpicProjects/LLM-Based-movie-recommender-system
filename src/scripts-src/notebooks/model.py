@@ -90,3 +90,28 @@ if st.button('Recommend Movies'):
     }
     recommendations = recommend_movies(user_preferences)
     st.write(recommendations)
+
+# Initialize the Groq LLaMA model
+client = Groq(
+    # This is the default and can be omitted
+    api_key=os.environ.get("GROQ_API_KEY"),
+)
+
+def generate_recommendations(favorite_series_overviews):
+    prompt = "I love these TV shows and the following are their overviews: " + ", ".join(favorite_series_overviews) +"These are the genres:"+",".join(user_genres) +". My preferred language is"+"".join(user_language)+". On a scale of 1 to 10, the popularity could be but not limited to " +"".join(user_popularity_threshold) +". Can you recommend some movies based on these preferences?"
+    
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": "you are a helpful assistant."
+            },
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
+        model="llama3-8b-8192",
+    )
+    
+    return chat_completion.choices[0].message.content
