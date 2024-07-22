@@ -75,3 +75,5 @@ Both datasets include the following columns:
 
 ### End Result
 The recommender system successfully integrates genre, popularity, and language filtering with the Llama3-8B model to provide personalized movie recommendations. By leveraging advanced language processing capabilities, the system can suggest movies with plot overviews similar to the user's favorite TV series, enhancing the relevance and personalization of the recommendations. The usage of Docker, GitHub Actions, venv, and cron ensures a robust, scalable, and maintainable application.
+
+![Preview](https://raw.githubusercontent.com/username/project/master/image-path/image.png)
