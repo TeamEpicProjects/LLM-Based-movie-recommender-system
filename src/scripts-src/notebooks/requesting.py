@@ -3,7 +3,7 @@ import json
 import os
 
 # Your TMDb API key
-api_key = 'your key'
+api_key = '58e058ef203e8d708105781819ad424c'
 
 # Base URL for TMDb API
 base_url = 'https://api.themoviedb.org/3'
@@ -11,7 +11,7 @@ base_url = 'https://api.themoviedb.org/3'
 # Endpoints for movies and TV shows
 movie_endpoint = f'{base_url}/movie/popular'
 tv_endpoint = f'{base_url}/tv/popular'
-genres_endpoint = f'{base_url}/genre/movie/list'  # Added for genres
+genres_endpoint = f'{base_url}/genre/movie/list'
 
 # Parameters for the API request
 params = {
@@ -20,13 +20,19 @@ params = {
     'page': 1
 }
 
+# Maximum number of pages to fetch to prevent overflow
+MAX_PAGES = 20
+
 # Function to fetch all pages of data
-def fetch_all_pages(endpoint, params):
+def fetch_all_pages(endpoint, params, max_pages=MAX_PAGES):
     all_results = []
     page = 1
-    while True:
+    while page <= max_pages:
         params['page'] = page
         response = requests.get(endpoint, params=params)
+        if response.status_code != 200:
+            print(f"Error fetching page {page}: {response.status_code}")
+            break
         data = response.json()
         if 'results' not in data:
             break
@@ -35,23 +41,20 @@ def fetch_all_pages(endpoint, params):
             break
         all_results.extend(results)
         page += 1
-        if page > data['total_pages']:
+        if page > data.get('total_pages', max_pages):
             break
     return all_results
 
 # Function to fetch genre names for a list of genre IDs
-def get_genre_names(genre_ids):
-    genres_url = f"{genres_endpoint}?api_key={api_key}&language=en-US"
-    response = requests.get(genres_url)
-    genres_data = response.json()
-    genre_dict = {genre["id"]: genre["name"] for genre in genres_data["genres"]}
-    genre_names = [genre_dict[id] for id in genre_ids if id in genre_dict]  # Handle missing IDs
+def get_genre_names(genre_ids, genre_dict):
+    genre_names = [genre_dict.get(id, "Unknown") for id in genre_ids]
     return genre_names
 
 # Fetch genres (one-time fetch)
 genres_response = requests.get(genres_endpoint, params={'api_key': api_key, 'language': 'en-US'})
 genres_data = genres_response.json()
-genre_dict = {genre["id"]: genre["name"] for genre in genres_data["genres"]}  # Create genre dictionary
+print("Genres Response Data:", genres_data)  # Debug print to check the structure
+genre_dict = {genre["id"]: genre["name"] for genre in genres_data.get("genres", [])}
 
 # Fetch all popular movies
 movies = fetch_all_pages(movie_endpoint, params)
@@ -59,7 +62,7 @@ movies = fetch_all_pages(movie_endpoint, params)
 # Process movie data
 for movie in movies:
     genre_ids = movie.get('genre_ids', [])  # Handle missing 'genre_ids' key
-    movie['genre_names'] = get_genre_names(genre_ids)
+    movie['genre_names'] = get_genre_names(genre_ids, genre_dict)
 
 # Fetch all popular TV shows
 tv_shows = fetch_all_pages(tv_endpoint, params)
@@ -67,10 +70,10 @@ tv_shows = fetch_all_pages(tv_endpoint, params)
 # Process TV show data (similar to movies)
 for tv_show in tv_shows:
     genre_ids = tv_show.get('genre_ids', [])
-    tv_show['genre_names'] = get_genre_names(genre_ids)
+    tv_show['genre_names'] = get_genre_names(genre_ids, genre_dict)
 
 # Define the directory to save the data
-data_dir = '../../data/'
+data_dir = 'src\data'
 
 # Ensure the directory exists
 if not os.path.exists(data_dir):
@@ -90,4 +93,3 @@ with open(tv_shows_path, 'w') as tv_file:
     json.dump(tv_shows, tv_file, indent=4)
 
 print('Data fetched and saved to ../data/movies.json and ../data/tv_shows.json with genre names!')
-

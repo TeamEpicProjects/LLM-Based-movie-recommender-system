@@ -15,7 +15,7 @@ def filter_by_genre(df, genres):
 def filter_by_popularity(df, threshold):
     return df[df['popularity'] >= threshold]
 
-groq.api_key = 'your groq key'
+groq.api_key = 'your key'
 
 def get_similar_overview(target_overview, candidates):
     prompt = f"Find the closest matching overviews to: {target_overview}\n\nCandidates:\n" + "\n".join(candidates)
